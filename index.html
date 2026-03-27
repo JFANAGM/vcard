@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carte de visite digitale</title>
+<meta name="description" content="Jeremy FABRE — Freelance Business / Project Manager à Aix-en-Provence. Me contacter, prendre rendez-vous.">
+<meta property="og:title" content="Jeremy FABRE — Freelance Business / Project Manager">
+<meta property="og:description" content="Carte de visite digitale. Me contacter, prendre rendez-vous.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jfanagm.github.io/vcard/">
+<title>Jeremy FABRE — Carte de visite</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a0f;--surface:#12121a;--border:#1e1e2e;--text:#e4e4e7;--text-muted:#71717a;--accent:#6366f1;--accent-hover:#818cf8;--radius:14px}
@@ -61,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <div class="card" id="app"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" integrity="sha256-MOBmSNziBMFBnEMsMGKrbNYjkwFiQEBnACfMMcEz6U4=" crossorigin="anonymous"></script>
 <script>
 // ═══════════════════════════════════════════
 //  CONFIG — Modifier vos informations ici
@@ -107,13 +112,15 @@ function generateVCard() {
     'VERSION:3.0',
     `N:${CONFIG.lastName};${CONFIG.firstName};;;`,
     `FN:${CONFIG.firstName} ${CONFIG.lastName}`,
-    `ORG:${CONFIG.company}`,
+  ];
+  if (CONFIG.company) lines.push(`ORG:${CONFIG.company}`);
+  lines.push(
     `TITLE:${CONFIG.title}`,
     `TEL;TYPE=CELL:${CONFIG.phone}`,
     `EMAIL:${CONFIG.email}`,
     `URL:${CONFIG.siteUrl}`,
     'END:VCARD'
-  ];
+  );
   return lines.join('\r\n');
 }
 

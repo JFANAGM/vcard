@@ -67,19 +67,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 //  CONFIG — Modifier vos informations ici
 // ═══════════════════════════════════════════
 const CONFIG = {
-  firstName: 'Jean-François',
-  lastName: 'MUSIC',
-  title: 'Consultant Digital & IA',
-  company: 'JFA CONSULTING',
-  city: 'Bordeaux, France',
-  email: 'contact@jfa-consulting.fr',
-  phone: '+33600000000',
+  firstName: 'Jeremy',
+  lastName: 'FABRE',
+  title: 'Freelance Business / Project Manager',
+  company: '',
+  city: 'Aix-en-Provence, France',
+  email: 'jeremyfabrepro@gmail.com',
+  phone: '+33669949814',
   siteUrl: 'https://jfanagm.github.io/vcard/',
   avatarUrl: '',  // URL d'image ou vide pour initiales
   links: [
-    { label: 'LinkedIn', desc: 'Mon profil professionnel', url: 'https://linkedin.com/in/', icon: 'linkedin', color: '#0a66c2' },
-    { label: 'Site web', desc: 'jfa-consulting.fr', url: 'https://jfa-consulting.fr', icon: 'globe', color: '#6366f1' },
-    { label: 'Calendly', desc: 'Réserver un créneau', url: 'https://calendly.com/', icon: 'calendar', color: '#00a2ff' },
+    { label: 'LinkedIn', desc: 'Mon profil professionnel', url: 'https://fr.linkedin.com/in/fabre-jeremy-93294b102', icon: 'linkedin', color: '#0a66c2' },
+    { label: 'Site web', desc: 'lesfousdubus.com', url: 'https://lesfousdubus.com', icon: 'globe', color: '#6366f1' },
+    { label: 'Calendly', desc: 'Réserver un créneau de 30 min', url: 'https://calendly.com/jeremyfabrepro/30min', icon: 'calendar', color: '#00a2ff' },
   ]
 };
 
@@ -159,7 +159,7 @@ function render() {
     <div class="header">
       <h1>${CONFIG.firstName} ${CONFIG.lastName}</h1>
       <div class="title">${CONFIG.title}</div>
-      <div class="company">${CONFIG.company}</div>
+      ${CONFIG.company ? `<div class="company">${CONFIG.company}</div>` : ''}
       <div class="location">${ICONS.pin} ${CONFIG.city}</div>
     </div>
 
@@ -187,7 +187,7 @@ function render() {
       <div class="qr-wrap"><div id="qrcode"></div></div>
     </div>
 
-    <div class="footer">JFA CONSULTING</div>
+    ${CONFIG.company ? `<div class="footer">${CONFIG.company}</div>` : ''}
   `;
 
   // Generate QR Code

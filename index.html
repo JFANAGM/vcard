@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte de visite digitale</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#12121a;--border:#1e1e2e;--text:#e4e4e7;--text-muted:#71717a;--accent:#6366f1;--accent-hover:#818cf8;--radius:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:24px 16px}
+.card{width:100%;max-width:440px}
+
+/* Avatar */
+.avatar-wrap{display:flex;justify-content:center;margin-bottom:20px;padding-top:16px}
+.avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);animation:glow 3s ease-in-out infinite}
+.avatar-placeholder{width:96px;height:96px;border-radius:50%;background:var(--surface);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:var(--accent);animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 12px rgba(99,102,241,.4)}50%{box-shadow:0 0 28px rgba(99,102,241,.7)}}
+
+/* Header */
+.header{text-align:center;margin-bottom:28px}
+.header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.header .title{color:var(--accent);font-size:.95rem;margin-top:4px}
+.header .company{color:var(--text-muted);font-size:.85rem;margin-top:2px}
+.header .location{color:var(--text-muted);font-size:.8rem;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:4px}
+
+/* Buttons */
+.actions{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--radius);font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s ease;border:2px solid var(--accent);text-decoration:none;color:var(--text)}
+.btn:hover{transform:scale(1.02);opacity:.9}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn-outline{background:transparent}
+.btn-outline:hover{background:rgba(99,102,241,.1)}
+.btn svg{width:18px;height:18px;flex-shrink:0}
+
+/* Links */
+.links{display:flex;flex-direction:column;gap:8px;margin-bottom:32px}
+.link-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .2s ease;text-decoration:none;color:var(--text)}
+.link-item:hover{transform:scale(1.02);border-color:var(--accent);background:rgba(99,102,241,.06)}
+.link-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.link-icon svg{width:20px;height:20px}
+.link-info{flex:1;min-width:0}
+.link-info .link-label{font-weight:600;font-size:.9rem}
+.link-info .link-desc{color:var(--text-muted);font-size:.78rem;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-arrow{color:var(--text-muted);flex-shrink:0}
+.link-add{border-style:dashed;border-color:var(--border);justify-content:center;color:var(--text-muted);font-size:.85rem;gap:6px}
+.link-add:hover{border-color:var(--accent);color:var(--accent)}
+
+/* QR */
+.qr-section{text-align:center;margin-bottom:28px}
+.qr-section h2{font-size:.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.qr-wrap{display:inline-block;padding:16px;background:#fff;border-radius:12px}
+#qrcode canvas{display:block}
+
+/* Footer */
+.footer{text-align:center;padding:16px 0 8px;color:var(--text-muted);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="card" id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG — Modifier vos informations ici
+// ═══════════════════════════════════════════
+const CONFIG = {
+  firstName: 'Jean-François',
+  lastName: 'MUSIC',
+  title: 'Consultant Digital & IA',
+  company: 'JFA CONSULTING',
+  city: 'Bordeaux, France',
+  email: 'contact@jfa-consulting.fr',
+  phone: '+33600000000',
+  siteUrl: 'https://jfa-consulting.fr',
+  avatarUrl: '',  // URL d'image ou vide pour initiales
+  links: [
+    { label: 'LinkedIn', desc: 'Mon profil professionnel', url: 'https://linkedin.com/in/', icon: 'linkedin', color: '#0a66c2' },
+    { label: 'Site web', desc: 'jfa-consulting.fr', url: 'https://jfa-consulting.fr', icon: 'globe', color: '#6366f1' },
+    { label: 'Calendly', desc: 'Réserver un créneau', url: 'https://calendly.com/', icon: 'calendar', color: '#00a2ff' },
+  ]
+};
+
+// ═══════════════════════════════════════════
+//  SVG Icons
+// ═══════════════════════════════════════════
+const ICONS = {
+  contact: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+  email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  linkedin: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  chevron: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  pin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+};
+
+// ═══════════════════════════════════════════
+//  vCard generation
+// ═══════════════════════════════════════════
+function generateVCard() {
+  const lines = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `N:${CONFIG.lastName};${CONFIG.firstName};;;`,
+    `FN:${CONFIG.firstName} ${CONFIG.lastName}`,
+    `ORG:${CONFIG.company}`,
+    `TITLE:${CONFIG.title}`,
+    `TEL;TYPE=CELL:${CONFIG.phone}`,
+    `EMAIL:${CONFIG.email}`,
+    `URL:${CONFIG.siteUrl}`,
+    'END:VCARD'
+  ];
+  return lines.join('\r\n');
+}
+
+function downloadVCard() {
+  const blob = new Blob([generateVCard()], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${CONFIG.firstName}_${CONFIG.lastName}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════
+//  Render
+// ═══════════════════════════════════════════
+function render() {
+  const initials = CONFIG.firstName[0] + CONFIG.lastName[0];
+  const app = document.getElementById('app');
+
+  const avatarHTML = CONFIG.avatarUrl
+    ? `<img class="avatar" src="${CONFIG.avatarUrl}" alt="${CONFIG.firstName} ${CONFIG.lastName}">`
+    : `<div class="avatar-placeholder">${initials}</div>`;
+
+  const linksHTML = CONFIG.links.map(link => `
+    <a class="link-item" href="${link.url}" target="_blank" rel="noopener">
+      <div class="link-icon" style="background:${link.color}15;color:${link.color}">
+        ${ICONS[link.icon] || ICONS.globe}
+      </div>
+      <div class="link-info">
+        <div class="link-label">${link.label}</div>
+        <div class="link-desc">${link.desc}</div>
+      </div>
+      <span class="link-arrow">${ICONS.chevron}</span>
+    </a>
+  `).join('');
+
+  app.innerHTML = `
+    <div class="avatar-wrap">${avatarHTML}</div>
+
+    <div class="header">
+      <h1>${CONFIG.firstName} ${CONFIG.lastName}</h1>
+      <div class="title">${CONFIG.title}</div>
+      <div class="company">${CONFIG.company}</div>
+      <div class="location">${ICONS.pin} ${CONFIG.city}</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="downloadVCard()">
+        ${ICONS.contact} Ajouter le contact
+      </button>
+      <a class="btn btn-outline" href="mailto:${CONFIG.email}">
+        ${ICONS.email} Email
+      </a>
+      <a class="btn btn-outline" href="tel:${CONFIG.phone}">
+        ${ICONS.phone} Appeler
+      </a>
+    </div>
+
+    <div class="links">
+      ${linksHTML}
+      <div class="link-item link-add">
+        ${ICONS.plus} Ajouter un lien
+      </div>
+    </div>
+
+    <div class="qr-section">
+      <h2>Scanner pour partager</h2>
+      <div class="qr-wrap"><div id="qrcode"></div></div>
+    </div>
+
+    <div class="footer">JFA CONSULTING</div>
+  `;
+
+  // Generate QR Code
+  new QRCode(document.getElementById('qrcode'), {
+    text: CONFIG.siteUrl,
+    width: 160,
+    height: 160,
+    colorDark: '#0a0a0f',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+
+render();
+</script>
+</body>
+</html>
